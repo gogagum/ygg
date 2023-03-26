@@ -10,3 +10,5 @@ docs/output
 compile_commands.json
 .clangd/*
 .cache/*
+*.user
+

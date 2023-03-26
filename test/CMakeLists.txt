@@ -1,5 +1,3 @@
-add_subdirectory(gtest)
-
 find_package( Threads )
 
 # Find Boost
@@ -7,10 +5,19 @@ find_package(Boost 1.58.0 REQUIRED)
 include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 set(LIBS ${LIBS} ${Boost_LIBRARIES})
 
-include_directories(SYSTEM ${GTEST_INCLUDE_DIRS})
+include(FetchContent)
+FetchContent_Declare(
+    googletest
+    URL https://github.com/google/googletest/archive/refs/tags/v1.13.0.zip
+)
+
+FetchContent_MakeAvailable(googletest)
 
 add_executable (run_tests main.cpp)
-add_dependencies(run_tests googletest)
+
+enable_testing()
+
+include(GoogleTest)
 
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS} -fno-omit-frame-pointer -Wall -Wextra -pedantic -Wfloat-equal \
 -Wundef -Wshadow -Wpointer-arith -Wcast-align -Wstrict-overflow=5 -Wwrite-strings -Wcast-qual \
@@ -28,7 +35,7 @@ set_target_properties(run_tests
                       PROPERTIES CXX_STANDARD 17
                       )
 
-target_link_libraries (run_tests ${LIBS} ${GTEST_LIBS_DIR}/libgtest.a ${GTEST_LIBS_DIR}/libgtest_main.a ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries (run_tests ${LIBS} gtest gtest_main ${CMAKE_THREAD_LIBS_INIT})
 
 string( TOLOWER "${CMAKE_BUILD_TYPE}" build_type_lower )
 IF(build_type_lower MATCHES "coverage")
