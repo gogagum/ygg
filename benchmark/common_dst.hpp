@@ -2,7 +2,8 @@
 #define BENCH_COMMON_DST_HPP
 
 #include "../src/ygg.hpp"
-#include "benchmark.h"
+#include <benchmark/benchmark.h>
+#include "benchmark_config.hpp"
 #include "common.hpp"
 
 #include <algorithm>
