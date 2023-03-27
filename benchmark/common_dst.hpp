@@ -3,7 +3,6 @@
 
 #include "../src/ygg.hpp"
 #include <benchmark/benchmark.h>
-#include "benchmark_config.hpp"
 #include "common.hpp"
 
 #include <algorithm>
