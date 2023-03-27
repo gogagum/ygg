@@ -23,6 +23,8 @@ if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/draup/draup.hpp")
 	message( FATAL_ERROR "draup.hpp not found. Did you forget to run 'git submodule update --init'?" )
 endif()
 
+message(STATUS "PAPI_LIBRARIES ${PAPI_LIBRARIES}")
+
 set(CMAKE_CXX_STANDARD 17)
 set(LIBS "${LIBS} Threads::Threads benchmark::benchmark")
 
@@ -32,7 +34,6 @@ target_link_libraries(run_all Threads::Threads benchmark::benchmark)
 
 if (PAPI_FOUND)
 	add_executable(run_all_papi run_all.cpp random.cpp)
-	add_dependencies(run_all_papi)
 	target_link_libraries(run_all_papi Threads::Threads benchmark::benchmark ${PAPI_LIBRARIES})
 	set_target_properties (run_all_papi PROPERTIES COMPILE_DEFINITIONS "USEPAPI")
 endif()
@@ -49,7 +50,6 @@ set_target_properties (run_all_zipf PROPERTIES COMPILE_DEFINITIONS "USEZIPF")
 
 if (PAPI_FOUND)
 	add_executable(run_all_zipf_papi run_all.cpp random.cpp)
-	add_dependencies(run_all_zipf_papi)
 	target_link_libraries(run_all_zipf_papi Threads::Threads benchmark::benchmark ${PAPI_LIBRARIES})
 	target_compile_definitions(run_all_zipf_papi PUBLIC USEPAPI USEZIPF)
 endif()
@@ -67,7 +67,6 @@ set_target_properties (run_all_presorted PROPERTIES COMPILE_DEFINITIONS "PRESORT
 
 if (PAPI_FOUND)
 	add_executable(run_all_presorted_papi run_all.cpp random.cpp)
-	add_dependencies(run_all_presorted_papi gbenchmark)
 	target_link_libraries(run_all_presorted_papi Threads::Threads benchmark::benchmark ${PAPI_LIBRARIES})
 	target_compile_definitions(run_all_presorted_papi PUBLIC USEPAPI PRESORT)
 endif()
@@ -84,7 +83,6 @@ set_target_properties (run_all_skewed PROPERTIES COMPILE_DEFINITIONS "USESKEWED"
 
 if (PAPI_FOUND)
 	add_executable(run_all_skewed_papi run_all.cpp random.cpp)
-	add_dependencies(run_all_skewed_papi)
 	target_link_libraries(run_all_skewed_papi Threads::Threads benchmark::benchmark ${PAPI_LIBRARIES})
 	target_compile_definitions(run_all_skewed_papi PUBLIC USEPAPI USESKEWED)
 endif()
