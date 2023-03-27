@@ -1,11 +1,21 @@
 project(benchmark C CXX)
 
-add_subdirectory(gbenchmark)
+include(FetchContent)
+
+################################################################################
+# Google-benchmark                                                             #
+################################################################################
+
+FetchContent_Declare(
+    gbenchmark
+    URL https://github.com/google/benchmark/archive/refs/tags/v1.7.1.zip
+)
+
+FetchContent_MakeAvailable(gbenchmark)
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
-include_directories(SYSTEM ${GBENCHMARK_INCLUDE_DIRS})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/draup) 
 include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 
@@ -14,82 +24,74 @@ if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/draup/draup.hpp")
 endif()
 
 set(CMAKE_CXX_STANDARD 17)
-set(LIBS "${LIBS} Threads::Threads ${GBENCHMARK_LIBS_DIR}/libbenchmark.a")
+set(LIBS "${LIBS} Threads::Threads benchmark::benchmark")
 
 # Normal
 add_executable(run_all run_all.cpp random.cpp)
-add_dependencies(run_all gbenchmark)
-target_link_libraries(run_all Threads::Threads ${GBENCHMARK_LIBS_DIR}/libbenchmark.a)
+target_link_libraries(run_all Threads::Threads benchmark::benchmark)
 
 if (PAPI_FOUND)
 	add_executable(run_all_papi run_all.cpp random.cpp)
-	add_dependencies(run_all_papi gbenchmark)
-	target_link_libraries(run_all_papi Threads::Threads ${GBENCHMARK_LIBS_DIR}/libbenchmark.a ${PAPI_LIBRARIES})
+	add_dependencies(run_all_papi)
+	target_link_libraries(run_all_papi Threads::Threads benchmark::benchmark ${PAPI_LIBRARIES})
 	set_target_properties (run_all_papi PROPERTIES COMPILE_DEFINITIONS "USEPAPI")
 endif()
 
 # OP-COUNTING
 add_executable(run_all_count run_all.cpp random.cpp)
-add_dependencies(run_all_count gbenchmark)
-target_link_libraries(run_all_count Threads::Threads ${GBENCHMARK_LIBS_DIR}/libbenchmark.a)
+target_link_libraries(run_all_count Threads::Threads benchmark::benchmark)
 set_target_properties (run_all_count PROPERTIES COMPILE_DEFINITIONS "COUNTOPS")
 
 # Zipf
 add_executable(run_all_zipf run_all.cpp random.cpp)
-add_dependencies(run_all_zipf gbenchmark)
-target_link_libraries(run_all_zipf Threads::Threads ${GBENCHMARK_LIBS_DIR}/libbenchmark.a)
+target_link_libraries(run_all_zipf Threads::Threads benchmark::benchmark)
 set_target_properties (run_all_zipf PROPERTIES COMPILE_DEFINITIONS "USEZIPF")
 
 if (PAPI_FOUND)
 	add_executable(run_all_zipf_papi run_all.cpp random.cpp)
-	add_dependencies(run_all_zipf_papi gbenchmark)
-	target_link_libraries(run_all_zipf_papi Threads::Threads ${GBENCHMARK_LIBS_DIR}/libbenchmark.a ${PAPI_LIBRARIES})
+	add_dependencies(run_all_zipf_papi)
+	target_link_libraries(run_all_zipf_papi Threads::Threads benchmark::benchmark ${PAPI_LIBRARIES})
 	target_compile_definitions(run_all_zipf_papi PUBLIC USEPAPI USEZIPF)
 endif()
 
 # OP-COUNTING + Zipf
 add_executable(run_all_zipf_count run_all.cpp random.cpp)
-add_dependencies(run_all_zipf_count gbenchmark)
-target_link_libraries(run_all_zipf_count Threads::Threads ${GBENCHMARK_LIBS_DIR}/libbenchmark.a)
+target_link_libraries(run_all_zipf_count Threads::Threads benchmark::benchmark)
 set_target_properties (run_all_zipf_count PROPERTIES COMPILE_DEFINITIONS "COUNTOPS;USEZIPF")
 
 
 # Presorted
 add_executable(run_all_presorted run_all.cpp random.cpp)
-add_dependencies(run_all_presorted gbenchmark)
-target_link_libraries(run_all_presorted Threads::Threads ${GBENCHMARK_LIBS_DIR}/libbenchmark.a)
+target_link_libraries(run_all_presorted Threads::Threads benchmark::benchmark)
 set_target_properties (run_all_presorted PROPERTIES COMPILE_DEFINITIONS "PRESORT")
 
 if (PAPI_FOUND)
 	add_executable(run_all_presorted_papi run_all.cpp random.cpp)
 	add_dependencies(run_all_presorted_papi gbenchmark)
-	target_link_libraries(run_all_presorted_papi Threads::Threads ${GBENCHMARK_LIBS_DIR}/libbenchmark.a ${PAPI_LIBRARIES})
+	target_link_libraries(run_all_presorted_papi Threads::Threads benchmark::benchmark ${PAPI_LIBRARIES})
 	target_compile_definitions(run_all_presorted_papi PUBLIC USEPAPI PRESORT)
 endif()
 
 # OP-COUNTING + Presorted
 add_executable(run_all_presorted_count run_all.cpp random.cpp)
-add_dependencies(run_all_presorted_count gbenchmark)
-target_link_libraries(run_all_presorted_count Threads::Threads ${GBENCHMARK_LIBS_DIR}/libbenchmark.a)
+target_link_libraries(run_all_presorted_count Threads::Threads benchmark::benchmark)
 set_target_properties (run_all_presorted_count PROPERTIES COMPILE_DEFINITIONS "COUNTOPS;PRESORT")
 
 # Skewed
 add_executable(run_all_skewed run_all.cpp random.cpp)
-add_dependencies(run_all_skewed gbenchmark)
-target_link_libraries(run_all_skewed Threads::Threads ${GBENCHMARK_LIBS_DIR}/libbenchmark.a)
+target_link_libraries(run_all_skewed Threads::Threads benchmark::benchmark)
 set_target_properties (run_all_skewed PROPERTIES COMPILE_DEFINITIONS "USESKEWED")
 
 if (PAPI_FOUND)
 	add_executable(run_all_skewed_papi run_all.cpp random.cpp)
-	add_dependencies(run_all_skewed_papi gbenchmark)
-	target_link_libraries(run_all_skewed_papi Threads::Threads ${GBENCHMARK_LIBS_DIR}/libbenchmark.a ${PAPI_LIBRARIES})
+	add_dependencies(run_all_skewed_papi)
+	target_link_libraries(run_all_skewed_papi Threads::Threads benchmark::benchmark ${PAPI_LIBRARIES})
 	target_compile_definitions(run_all_skewed_papi PUBLIC USEPAPI USESKEWED)
 endif()
 
 # OP-COUNTING + Skewed
 add_executable(run_all_skewed_count run_all.cpp random.cpp)
-add_dependencies(run_all_skewed_count gbenchmark)
-target_link_libraries(run_all_skewed_count Threads::Threads ${GBENCHMARK_LIBS_DIR}/libbenchmark.a)
+target_link_libraries(run_all_skewed_count Threads::Threads benchmark::benchmark)
 set_target_properties (run_all_skewed_count PROPERTIES COMPILE_DEFINITIONS "COUNTOPS;USESKEWED")
 
 # Create BST scripts
@@ -119,12 +121,22 @@ ENDFOREACH()
 
 
 add_executable(pathlengths pathlengths.cpp random.cpp)
+target_link_libraries(pathlengths benchmark::benchmark)
+
 add_executable(wbtree_balance wbtree_balance.cpp)
+target_link_libraries(wbtree_balance benchmark::benchmark)
+
 add_executable(dst_balance dst_balance.cpp)
+target_link_libraries(dst_balance benchmark::benchmark)
+
 add_executable(count_rotations count_rotations.cpp)
+target_link_libraries(count_rotations benchmark::benchmark)
+
 add_executable(translate_sequence translate_sequence.cpp)
+target_link_libraries(translate_sequence benchmark::benchmark)
+
 add_executable(sequence sequence.cpp)
+target_link_libraries(sequence benchmark::benchmark)
 
 add_executable(paired paired.cpp random.cpp)
-add_dependencies(paired gbenchmark)
-target_link_libraries(paired Threads::Threads ${GBENCHMARK_LIBS_DIR}/libbenchmark.a)
+target_link_libraries(paired Threads::Threads benchmark::benchmark)
