@@ -23,6 +23,10 @@ make
 
 Note that if you don't use the `-DCMAKE_BUILD_TYPE` switch, optimization is turned off and you will see a warning if you run the benchmarks.
 
+Required PAPI version is `7.0.1`.
+See [PAPI repository](https://bitbucket.org/icl/papi/src/master/).
+PAPI is also available in some of linux distributions repositories. For example, in [AUR](https://aur.archlinux.org/packages/papi) and in [Debian packages](https://packages.debian.org/sid/libpapi7.0).
+
 Running Benchmarks
 ==================
 

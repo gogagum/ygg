@@ -184,7 +184,7 @@ public:
 		if (!this->initialized) {
 			this->initialized = true;
 
-			int num_counters = PAPI_num_counters();
+			int num_counters = PAPI_num_hwctrs();
 			if (!PAPI_STATS_WRITTEN) {
 				std::cout << "## Your system has " << num_counters
 				          << " PAPI counters.\n";
@@ -236,9 +236,23 @@ public:
 	start()
 	{
 #ifdef USEPAPI
-		// TODO error handling
-		PAPI_start_counters(this->selected_events.data(),
-		                    static_cast<int>(this->selected_events.size()));
+		if (const auto create_set_result = PAPI_create_eventset(&this->selected_events_set);
+				create_set_result != PAPI_OK) {
+			throw std::runtime_error("Error while creating PAPI event set.");
+		}
+
+		if (const auto create_set_result = PAPI_add_events(
+					this->selected_events_set,
+					this->selected_events.data(),
+					static_cast<int>(this->selected_events.size()));
+				create_set_result != PAPI_OK) {
+			throw std::runtime_error("Error while adding events into set.");
+		}
+		
+		if (const auto start_result = PAPI_start(this->selected_events_set);
+				start_result != PAPI_OK) {
+			throw std::runtime_error("Error at PAPI_start.");
+		}
 #endif
 	}
 
@@ -246,9 +260,12 @@ public:
 	stop()
 	{
 #ifdef USEPAPI
-		// TODO error handling
-		PAPI_stop_counters(this->event_counts.data(),
-		                   static_cast<int>(this->event_counts.size()));
+		if (const auto papi_stop_result = PAPI_stop(this->selected_events_set,
+												    this->event_counts.data());
+					PAPI_OK != papi_stop_result) {
+			throw std::runtime_error("Error at papi_stop.");
+		}
+		
 		std::transform(this->event_counts.begin(), this->event_counts.end(),
 		               this->event_count_accu.begin(),
 		               this->event_count_accu.begin(), std::plus<long long>());
@@ -276,6 +293,7 @@ private:
 	std::vector<long long> event_counts;
 	std::vector<long long> event_count_accu;
 	bool initialized = false;
+	int selected_events_set;
 #endif
 };
 
